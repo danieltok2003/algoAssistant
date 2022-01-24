@@ -34,11 +34,12 @@ def grabHashPassword(userType, userName, f):
     elif userType == 'student':
         f.execute("SELECT hashPass from Students WHERE userName=?", (userName,))
     hash = f.fetchone()[0]
+    print(hash)
     return hash
 
 
 def authenticateUser(userType, userName, newPassword, auth):
-    file = sqlite3.connect(f'{userType}.db')
+    file = sqlite3.connect(f'data.db')
     f = file.cursor()
     """
     

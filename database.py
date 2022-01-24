@@ -1,13 +1,10 @@
 import sqlite3
 
-student = sqlite3.connect('student.db')
-classroom = sqlite3.connect('classroom.db')
-teacher = sqlite3.connect('teacher.db')
+data = sqlite3.connect('data.db')
 
+d = data.cursor()
 
-s = student.cursor()  # create student table /////////////////
-
-s.execute("""
+d.execute("""
         CREATE TABLE Students (
             studentID INTEGER PRIMARY KEY,
             classID INTEGER,
@@ -18,26 +15,29 @@ s.execute("""
             timeSpent REAL,
             questionsAttempted INTEGER,
             questionsCorrect INTEGER,
-            FOREIGN KEY(classID) REFERENCES Classroom(classID)
-)""")
+            FOREIGN KEY(classID) REFERENCES Classroom(classID)    
+            )
+        """)
 
+data.commit()
 
-c = classroom.cursor()  # creating classroom table //////////////
-
-c.execute(
-    """CREATE TABLE Classrooms (
+d.execute("""
+    
+        CREATE TABLE Classrooms (
             classID INTEGER PRIMARY KEY,
             teacherID INTEGER,
             className TEXT,
             FOREIGN KEY(teacherID) REFERENCES Teacher(teacherID)
-            )"""
-)
+            )
+        """)
+
+data.commit()
+
+d.execute("""
 
 
-t = teacher.cursor()  # creating teacher table //////////////
 
-t.execute(
-    """CREATE TABLE Teachers (
+ CREATE TABLE Teachers (
             teacherID INTEGER PRIMARY KEY,
             classID INTEGER,
             firstName TEXT,
@@ -45,26 +45,14 @@ t.execute(
             userName TEXT,
             hashPass TEXT,
             FOREIGN KEY(classID) REFERENCES Classroom(classID)
-            )"""
-)
-
+            )
+            """)
 
 # commit command
-student.commit()
-classroom.commit()
-teacher.commit()
-
+data.commit()
 
 # close connection
-student.close()
-classroom.close()
-teacher.close()
+data.close()
 
 
 
-# datatypes:
-# NULL
-# INTEGER
-# REAL
-# TEXT
-# BLOB

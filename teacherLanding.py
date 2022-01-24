@@ -4,29 +4,53 @@ from generatingSalt import generatePassword
 import os
 import sys
 
+file = sqlite3.connect(f'data.db')
+f = file.cursor()
+
+
+def relationShips():
+    relation = ''
+
+    for teacher in teacherData:
+        userName = f'{teacher[0][0].lower()}{teacher[0][1:]}{teacher[1][0].upper()}{teacher[1][1:]}'
+
+        relation += f'{teacher[0]} {teacher[1]} teaches Class '   # firstName lastName
+        f.execute("""
+            SELECT C.className 
+            FROM Teachers T INNER JOIN Classrooms C
+            ON T.classID = C.classID
+            WHERE T.userName=?
+        """, (userName,))  #  formatting User Name to userName
+
+        relation += f.fetchone()[0]
+
+        f.execute("""
+            SELECT S.firstName, S.lastName
+            FROM Teachers T INNER JOIN Students S
+            ON T.classID = S.classID
+            WHERE T.userName=?
+        """, (userName,))
+
+        relation += f' | {", ".join([" ".join(person) for person in f.fetchall()])} |'
+        relation += '\n'
+
+    return relation
+
 
 def grabData(tableType):
-    file = sqlite3.connect(f'{tableType}.db')
-    f = file.cursor()
+
     if tableType == 'teacher':
-        f.execute("""
-        SELECT T.classID, T.firstName, T.lastName, S.firstName, S.classID
-        FROM Teachers T INNER JOIN Students S
-        ON T.classID = S.classID
-        
-        """)
+        f.execute("SELECT firstName, lastName FROM Teachers")
     elif tableType == 'student':
-        f.execute("SELECT userName, classID FROM Students")
+        f.execute("SELECT firstName, lastName FROM Students")
     elif tableType == 'classroom':
-        f.execute("SELECT className, teacherID FROM Classrooms")
+        f.execute("SELECT className FROM Classrooms")
 
     rows = f.fetchall()
     return rows
 
 
 def removeRecord(tableType):   # TODO - verify not deleting classrooms with students/teachers assigned to them
-    file = sqlite3.connect(f'{tableType}.db')
-    f = file.cursor()
     if tableType == 'teacher':
         f.execute("SELECT teacherID, userName FROM Teachers")
     elif tableType == 'student':
@@ -35,9 +59,9 @@ def removeRecord(tableType):   # TODO - verify not deleting classrooms with stud
         f.execute("SELECT classID, className FROM Classrooms")
     print("|  ID  |  NAME  |")
     for item in f.fetchall():
-        print(f'{item[0]}. {item[1]}')
+        print(f'{item[0]} : {item[1]}')
 
-    ID = input('Enter ID of user to delete: ')  # TODO - check if ID exists
+    ID = input('Enter ID of user/classroom to delete: ')  # TODO - check if ID exists
     if tableType == 'teacher':
         f.execute("DELETE FROM Teachers WHERE teacherID=?", (ID,))  # todo - unnecessary if repetition
     elif tableType == 'student':
@@ -45,18 +69,40 @@ def removeRecord(tableType):   # TODO - verify not deleting classrooms with stud
     elif tableType == 'classroom':
         f.execute("DELETE FROM Classrooms WHERE classID=?", (ID,))
 
+
     file.commit()
+    print('Successful removal.')
     refresh()
 
 
+
+"""
+
+query list of class names, teacher names, student names
+
+then at bottom, show teacher-class , list of students
+add button to query student report
+"""
+
+def classroomList():
+    pass
+
+
 def addData(tableType):
-    file = sqlite3.connect(f'{tableType}.db')
-    f = file.cursor()
     if tableType == 'classroom':
-        pass
+        className = input('Class name: ')
+
+        f.execute("SELECT teacherID, userName FROM Teachers")
+        print("|  ID  |  NAME  |")
+        for item in f.fetchall():
+            print(f'{item[0]} : {item[1]}')
+
+        teacherID = input('Choose assigned teacher ID: ')
+        ID = len(classRoomData) + 1
+        f.execute("INSERT INTO Classrooms VALUES (?, ?, ?)", (ID, teacherID, className,))
     else:
         firstName = input('First name: ')
-        lastName = input('Last name: ')  # todo - VERIFY ONLY ALPHA CHARS
+        lastName = input('Last name: ')
         password = input('Assign password: ')
         classID = input('Assign classID: ')  # TODO - VERIFY if classID exists
 
@@ -68,10 +114,35 @@ def addData(tableType):
         else:
             ID = len(studentData) + 1
             f.execute("INSERT INTO Students VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                      (ID, classID, firstName, lastName, userName, 0, 0, 0, generatePassword(password)))  # inserting 0s for 0 time spent, qAs, qCs
-        print('Success. User added.')
-        file.commit()
-        refresh()  # restart window to show updates
+                      (ID, classID, firstName, lastName, userName, generatePassword(password), 0, 0, 0))  # inserting 0s for 0 time spent, qAs, qCs
+
+    file.commit()
+    print(f'Success. User/classroom added. Username is : {userName}')
+    refresh()  # restart window to show updates
+
+
+def getReport():
+    f.execute("SELECT studentID, userName FROM Students")
+    print("|  ID  |  NAME  |")
+    for item in f.fetchall():
+        print(f'{item[0]} : {item[1]}')
+
+    ID = int(input('Give the ID of the desired student report: '))  # TODO - verification
+
+    f.execute("""
+            SELECT userName, timeSpent, questionsAttempted, questionsCorrect
+            FROM Students S
+            WHERE S.studentID=?
+              
+              """, (ID,))
+    report = list(f.fetchone())
+    print(report)
+    print(f'| Student {report[0]} Report |')
+    print(f'{report[1]} minutes spent')
+    print(f'{report[2]} questions attempted')
+    print(f'{report[3]} questions answered correctly')
+
+
 
 
 def main():
@@ -120,6 +191,12 @@ def main():
     addStudent = Button(root, text='Add student', command=lambda: addData('student'))
     addStudent.pack()
 
+    extractReport = Button(root, text='Extract report', command=getReport)
+    extractReport.pack()
+
+    removeStudent = Button(root, text='Remove student', command=lambda: removeRecord('student'))
+    removeStudent.pack()
+
 
     """
     classroom table
@@ -128,6 +205,21 @@ def main():
     classroomLabel.pack()
     classroomTable = Label(root, text=str(classRoomData), bg='white')
     classroomTable.pack()
+
+    addClassroom = Button(root, text='Add classroom', command=lambda: addData('classroom'))
+    addClassroom.pack()
+
+    removeClassroom = Button(root, text='Remove classroom', command=lambda: removeRecord('classroom'))
+    removeClassroom.pack()
+
+
+    """
+    relationship 
+    """
+
+    relateLabel = Label(root, text=relationShips(), bg='white')
+    relateLabel.pack()
+
 
     """
     main loop
