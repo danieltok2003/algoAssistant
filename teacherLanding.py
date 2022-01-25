@@ -84,9 +84,6 @@ then at bottom, show teacher-class , list of students
 add button to query student report
 """
 
-def classroomList():
-    pass
-
 
 def addData(tableType):
     if tableType == 'classroom':
@@ -117,7 +114,7 @@ def addData(tableType):
                       (ID, classID, firstName, lastName, userName, generatePassword(password), 0, 0, 0))  # inserting 0s for 0 time spent, qAs, qCs
 
     file.commit()
-    print(f'Success. User/classroom added. Username is : {userName}')
+    print(f'Success. User/classroom added.')
     refresh()  # restart window to show updates
 
 
@@ -141,8 +138,6 @@ def getReport():
     print(f'{report[1]} minutes spent')
     print(f'{report[2]} questions attempted')
     print(f'{report[3]} questions answered correctly')
-
-
 
 
 def main():

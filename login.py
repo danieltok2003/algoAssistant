@@ -1,6 +1,15 @@
 import sqlite3
 import hashlib
 import os
+import studentLanding
+import teacherLanding
+
+
+
+"""
+ PASS VARAIBLE TO STUDENT LANDING
+"""
+TeacherORStudent = ''
 
 errorTypeToErrorMessage = {
     'invalidInput': 'Invalid input. Try again.',
@@ -34,7 +43,6 @@ def grabHashPassword(userType, userName, f):
     elif userType == 'student':
         f.execute("SELECT hashPass from Students WHERE userName=?", (userName,))
     hash = f.fetchone()[0]
-    print(hash)
     return hash
 
 
@@ -84,11 +92,19 @@ def errorMessage(errorType):
     print(errorTypeToErrorMessage[errorType])
 
 
-def main():
+def passUserName(userName):
+    return userName
 
+
+passingUser = ''
+
+
+def login():
+    global TeacherORStudent
+    userName = ''
+    global passingUser
     stage1 = False  # stage 1 - checking user type
     stage2 = False  # stage 2 - authenticating user
-    TeacherORStudent = ''
     while stage1 is False or stage2 is False:  # main loop for authentication
         """
     
@@ -120,16 +136,20 @@ def main():
 
         stage2 = True
 
-    print('User authenticated.')
+    passingUser = userName
 
-    if TeacherORStudent == 'T':
-        os.system('python teacherLanding.py')
-    else:
-        os.system('python studentLanding.py')
+    print('User authenticated.')
 
 
 if __name__ == '__main__':
-    main()
+    login()
+
+    if TeacherORStudent == 'T':
+        teacherLanding.main()
+    else:
+        studentLanding.main(passingUser)
+
+
 
 
 
