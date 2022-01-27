@@ -4,7 +4,7 @@ import os
 import studentLanding
 import teacherLanding
 
-
+database = 'data.db'  # allow to be set by user
 
 """
  PASS VARAIBLE TO STUDENT LANDING
@@ -47,7 +47,7 @@ def grabHashPassword(userType, userName, f):
 
 
 def authenticateUser(userType, userName, newPassword, auth):
-    file = sqlite3.connect(f'data.db')
+    file = sqlite3.connect(database)
     f = file.cursor()
     """
     

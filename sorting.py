@@ -104,6 +104,24 @@ class Sorting:
 
 
 def main():
+    global grid
+    global master
+    global window
+    global randomizeHeights
+    global bubbleSortButton
+    global mergeSortButton
+    grid = Sorting({}, [])
+
+    master = Tk()
+    master.resizable(False, False)
+    window = Canvas(master, width=800, height=600)
+
+    randomizeHeights = Button(master, height=1, width=15, text='Randomize Heights', command=grid.randomizeHeights)
+
+    bubbleSortButton = Button(master, height=1, width=15, text='Bubble Sort', command=grid.background_bubbleSort)
+
+    mergeSortButton = Button(master, height=1, width=15, text='Merge Sort',
+                             command=grid.background_mergeSort)  # todo -remove repetition
 
     randomizeHeights.pack()
     bubbleSortButton.pack()
@@ -112,20 +130,7 @@ def main():
     master.mainloop()
 
 
-grid = Sorting({}, [])
 
-master = Tk()
-master.resizable(False, False)
-window = Canvas(master, width=800, height=600)
-
-
-randomizeHeights = Button(master, height=1, width=15, text='Randomize Heights', command=grid.randomizeHeights)
-
-
-bubbleSortButton = Button(master, height=1, width=15, text='Bubble Sort', command=grid.background_bubbleSort)
-
-
-mergeSortButton = Button(master, height=1, width=15, text='Merge Sort', command=grid.background_mergeSort)  # todo -remove repetition
 
 
 

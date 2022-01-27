@@ -3,6 +3,8 @@ from tkinter import *
 import pathfinding
 import sorting
 
+userName = 'danielTok'  # TODO - REMOVE AFTER TESTING
+
 
 def main(userName):
     print('Initialising student login...')
@@ -20,11 +22,14 @@ def main(userName):
     button options
     """
 
-    bfs = Button(root, text='Run BFS', command=pathfinding.main)  # split pathfinding files into bfs and dfs
+    bfs = Button(root, text='Run BFS / DFS', command=pathfinding.main)  # split pathfinding files into bfs and dfs
     bfs.pack()
 
-    bubbleSort = Button(root, text='Run Bubble Sort', command=sorting.main)  # split pathfinding files into bfs and dfs
+    bubbleSort = Button(root, text='Run Bubble Sort', command=sorting.main)
     bubbleSort.pack()
+
+    quiz = Button(root, text='Try quiz', command=sorting.main)  # split pathfinding files into bfs and dfs
+    quiz.pack()
 
 
 

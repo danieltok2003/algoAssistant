@@ -198,6 +198,29 @@ def dfs():  # TODO  - corners are marked as mark, not visited. something wrong w
 
 
 def main():
+    global master
+    global window
+    global startXcoord
+    global startYcoord
+    global targetXcoord
+    global targetYcoord
+    global setTargetButton
+    global setStartButton
+    global bfsButton
+    global dfsButton
+    master = Tk()
+    master.resizable(False, False)
+    window = Canvas(master, width=800, height=600)
+
+    startXcoord = Entry(master)
+    startYcoord = Entry(master)
+
+    setStartButton = Button(master, height=1, width=15, text='Set start coords', command=getStartCoords)
+    targetXcoord = Entry(master)
+    targetYcoord = Entry(master)
+    setTargetButton = Button(master, height=1, width=15, text='Set target coords', command=getTargetCoords)
+    bfsButton = Button(master, height=1, width=15, text='BFS', command=background_bfs)
+    dfsButton = Button(master, height=1, width=15, text='DFS', command=background_dfs)
 
     master.title(f'{gridWidth} x {gridHeight} grid')
     master.after(0, createGrid)
@@ -221,20 +244,7 @@ def main():
     master.mainloop()
 
 
-master = Tk()
-master.resizable(False, False)
-window = Canvas(master, width=800, height=600)
 
-
-startXcoord = Entry(master)
-startYcoord = Entry(master)
-
-setStartButton = Button(master, height=1, width=15, text='Set start coords', command=getStartCoords)
-targetXcoord = Entry(master)
-targetYcoord = Entry(master)
-setTargetButton = Button(master, height=1, width=15, text='Set target coords', command=getTargetCoords)
-bfsButton = Button(master, height=1, width=15, text='BFS', command=background_bfs)
-dfsButton = Button(master, height=1, width=15, text='DFS', command=background_dfs)
 
 if __name__ == "__main__":
     main()

@@ -12,27 +12,30 @@ def relationShips():
     relation = ''
 
     for teacher in teacherData:
-        userName = f'{teacher[0][0].lower()}{teacher[0][1:]}{teacher[1][0].upper()}{teacher[1][1:]}'
+        try:
+            userName = f'{teacher[0][0].lower()}{teacher[0][1:]}{teacher[1][0].upper()}{teacher[1][1:]}'
 
-        relation += f'{teacher[0]} {teacher[1]} teaches Class '   # firstName lastName
-        f.execute("""
+            relation += f'{teacher[0]} {teacher[1]} teaches Class '   # firstName lastName
+            f.execute("""
             SELECT C.className 
             FROM Teachers T INNER JOIN Classrooms C
             ON T.classID = C.classID
             WHERE T.userName=?
-        """, (userName,))  #  formatting User Name to userName
+            """, (userName,))  #  formatting User Name to userName
 
-        relation += f.fetchone()[0]
+            relation += f.fetchone()[0]
 
-        f.execute("""
+            f.execute("""
             SELECT S.firstName, S.lastName
             FROM Teachers T INNER JOIN Students S
             ON T.classID = S.classID
             WHERE T.userName=?
-        """, (userName,))
+            """, (userName,))
 
-        relation += f' | {", ".join([" ".join(person) for person in f.fetchall()])} |'
-        relation += '\n'
+            relation += f' | {", ".join([" ".join(person) for person in f.fetchall()])} |'
+            relation += '\n'
+        except TypeError:
+            continue
 
     return relation
 
