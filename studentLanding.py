@@ -2,8 +2,20 @@ import login
 from tkinter import *
 import pathfinding
 import sorting
+import quizSystem
+import sqlite3
 
-userName = 'danielTok'  # TODO - REMOVE AFTER TESTING
+file = sqlite3.connect(f'data.db')
+f = file.cursor()
+
+
+def getStudentStats(userName):
+    f.execute("""
+        SELECT timeSpent, questionsAttempted, questionsCorrect
+            FROM Students S
+            WHERE S.userName=?
+    """, (userName,))
+    return f.fetchall()[0]
 
 
 def main(userName):
@@ -22,14 +34,23 @@ def main(userName):
     button options
     """
 
-    bfs = Button(root, text='Run BFS / DFS', command=pathfinding.main)  # split pathfinding files into bfs and dfs
+    bfs = Button(root, text='Run BFS / DFS', command=pathfinding.main)
     bfs.pack()
 
     bubbleSort = Button(root, text='Run Bubble Sort', command=sorting.main)
     bubbleSort.pack()
 
-    quiz = Button(root, text='Try quiz', command=sorting.main)  # split pathfinding files into bfs and dfs
+    quiz = Button(root, text='Try quiz', command=quizSystem.main)
     quiz.pack()
+    if userName != 'unknownUser':
+        timeSpent = Label(root, text=f'Time spent: {getStudentStats(userName)[0]} minutes', bg='white')
+        questionsAttempted = Label(root, text=f'Questions attempted: {getStudentStats(userName)[1]}', bg='white')
+        questionsCorrect = Label(root, text=f'Questions correct: {getStudentStats(userName)[2]}', bg='white')
+        timeSpent.pack()
+        questionsAttempted.pack()
+        questionsCorrect.pack()
+
+
 
 
 
@@ -40,4 +61,7 @@ def main(userName):
 
 
 if __name__ == '__main__':
-    main(userName)
+    try:
+        main(userName)
+    except NameError:
+        main('danielTok')
