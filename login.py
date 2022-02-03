@@ -143,7 +143,6 @@ def login():
 
 if __name__ == '__main__':
     login()
-
     if TeacherORStudent == 'T':
         teacherLanding.main()
     else:

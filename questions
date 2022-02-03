@@ -1,0 +1,4 @@
+What is the time complexity of merge sort? *O(nlogn), O(n), O(1), O(n^2)*
+What data structure does BFS use? *queue, stack, string, integer*
+What is the time complexity of bubble sort? *O(n^2), O(1), O(logn), O(nlogn)*
+What data type does DFS use? *stack, queue, integer, list*

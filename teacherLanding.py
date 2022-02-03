@@ -3,9 +3,11 @@ import sqlite3
 from generatingSalt import generatePassword
 import os
 import sys
-
+# TODO - report gives time in seconds, not minutes
 file = sqlite3.connect(f'data.db')
 f = file.cursor()
+
+questionFile = 'questions'
 
 
 def relationShips():
@@ -143,6 +145,53 @@ def getReport():
     print(f'{report[3]} questions answered correctly')
 
 
+def layoutQuestions():
+    with open(questionFile, 'r') as questions:
+        print('|qNum| Question|')
+        for questionNumber, question in enumerate(questions.readlines()):  # gives numbered list of question num to Q
+            print(f'{questionNumber}.  {question}')
+        questions.close()
+
+
+def addQuestion():
+    question = input('Add question: ')
+
+    options = input('Add 4 comma separated options, with the first being the correct option: ')
+    while options.count(',') != 3:
+        print('Need exactly 4 options')
+        options = input('Add 4 comma separated options, with the first being the correct option: ')
+
+    with open(questionFile, 'a') as questions:
+        questions.write(question + f' *{options}*' + '\n')
+        questions.close()
+    layoutQuestions()
+
+
+def removeQuestion():
+    with open(questionFile, 'r+') as questions:
+        questionList = questions.readlines()
+        print('|qNum| Question|')
+        for questionNumber, question in enumerate(questionList):  # gives numbered list of question num to Q
+            print(f'{questionNumber}.  {question}')
+
+        while True:
+            try:
+                removeNum = int(input('Remove question number: '))
+                break
+            except ValueError:
+                print('Must enter an integer')
+
+        del questionList[removeNum]  # removes desired question from list
+        questions.truncate(0)  # clears file to prep for readding rest of questions
+        for line in questionList:
+            questions.write(line)
+
+    layoutQuestions()
+
+
+
+
+
 def main():
     global root
     global teacherData
@@ -217,6 +266,16 @@ def main():
 
     relateLabel = Label(root, text=relationShips(), bg='white')
     relateLabel.pack()
+
+    """
+    quiz questions
+    """
+
+    addQ = Button(root, text='Add question', command=addQuestion)
+    addQ.pack()
+
+    removeQ = Button(root, text='Remove question', command=removeQuestion)
+    removeQ.pack()
 
 
     """

@@ -20,6 +20,7 @@ grid = {}  # grid = { [xCoord, yCoord]: [dimensions] }
 wallsFile = 'walls'
 timing = 0
 
+file = 'studentSession'
 
 def createGrid():
     global grid
@@ -212,6 +213,15 @@ def refresh():
     main()
 
 
+def uploadTime():
+    with open(file, 'w') as studentSession:  # opening as 'w' clears file for new session
+        studentSession.write('0' + '\n')
+        studentSession.write('0' + '\n')
+        studentSession.write(str(round(time.time() - start_time, 0)) + '\n')
+        studentSession.close()
+    master.destroy()
+
+
 def main():
     global master
     global window
@@ -223,6 +233,8 @@ def main():
     global setStartButton
     global bfsButton
     global dfsButton
+    global start_time
+    start_time = time.time()
     master = Tk()
     master.resizable(False, False)
     window = Canvas(master, width=800, height=600)
@@ -242,6 +254,7 @@ def main():
     fast = Button(master, height=1, width=15, text='Fast', command=lambda: timeControl(0), bg='green')
 
     reset = Button(master, height=1, width=15, text='Reset', command=refresh)
+    exitButton = Button(master, text="Save work", command=uploadTime)
 
     master.title(f'{gridWidth} x {gridHeight} grid')
     master.after(0, createGrid)
@@ -267,6 +280,8 @@ def main():
     fast.pack()
 
     reset.pack()
+
+    exitButton.pack()
 
     master.mainloop()
 

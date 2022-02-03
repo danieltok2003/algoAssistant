@@ -2,6 +2,10 @@ from tkinter import *
 import threading
 import random
 import time
+import pathfinding
+from pathfinding import uploadTime
+
+file = ''
 
 
 
@@ -73,6 +77,7 @@ class Sorting:
 
 
 timing = 0
+
 def timeControl(timeInterval):
     global timing
     timing = timeInterval
@@ -81,6 +86,7 @@ def timeControl(timeInterval):
 def refresh():
     master.destroy()
     main()
+
 
 def main():
     global grid
