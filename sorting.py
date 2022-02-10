@@ -56,6 +56,7 @@ class Sorting:
             foreColToHeights.setdefault(val, key)
 
     def background_bubbleSort(self):
+        bubbleSortButton["state"] = "disabled"
         threading.Thread(target=self.bubbleSort).start()
 
     def bubbleSort(self):
@@ -74,6 +75,7 @@ class Sorting:
 
         for colIndex in range(len(self.foregroundCols)):  # colors all blocks green when correct condition
             window.itemconfig(self.foregroundCols[colIndex], fill=self.correctColor)
+        bubbleSortButton["state"] = "normal"
 
 
 timing = 0

@@ -22,6 +22,7 @@ timing = 0
 
 file = 'studentSession'
 
+
 def createGrid():
     global grid
     rootX = 0
@@ -44,6 +45,8 @@ def paintCoords(x, y, coordType):  # handles painting of start, target, mark, pa
     elif coordType == 'targetCoords':
         color = TARGET
         setTargetButton["state"] = "disabled"
+
+
     elif coordType == 'markCoords':
         color = MARK
     elif coordType == 'pathCoords':
@@ -52,8 +55,11 @@ def paintCoords(x, y, coordType):  # handles painting of start, target, mark, pa
         color = VISITED
     elif coordType == 'blockCoords':
         color = BLOCK
-    window.create_rectangle(grid[(x, y)][0], grid[(x, y)][1], grid[(x, y)][2],
+    try:
+        window.create_rectangle(grid[(x, y)][0], grid[(x, y)][1], grid[(x, y)][2],
                             grid[(x, y)][3], fill=color, outline='black')
+    except KeyError:
+        print('Out of range coordinates entered')
 
     window.pack()
 
@@ -76,7 +82,7 @@ def backTrace(parent, start, end):
 
 def calculateEdges():
     nodes = list(grid.keys())
-    edges = {}  # dictionary where {coordinate : dimensions }
+    edges = {}  # dictionary where {node : [neighbour1, neighbour2, neighbour3, neighbour 4] }
     for node in nodes:
         try:
             for neighbour in nodes:
@@ -105,7 +111,6 @@ def drawObstacles(edges):
 
 
 def background_bfs():
-
     threading.Thread(target=bfs).start()
 
 
@@ -114,14 +119,22 @@ def background_dfs():  # multithreading to allow window to keep updating with ea
 
 
 def bfs():
-    start = (int(startXcoord.get()), int(startYcoord.get()))  # extracting input from entry boxes
-    target = (int(targetXcoord.get()), int(targetYcoord.get()))
+    try:
+        start = (int(startXcoord.get()), int(startYcoord.get()))  # extracting input from entry boxes
+        target = (int(targetXcoord.get()), int(targetYcoord.get()))
+    except ValueError:
+        print('Input cannot be blank or string')
+        return 0
+
+    if testInputRange(start, target) is True:
+        print('Out of range input coordinates')
+        return 0
 
     explored = []
     queue = [start]
     parent = {}
     edges = calculateEdges()  # gathering all valid edges
-    print(edges)
+    print('To draw obstacles, write coords to the walls.txt file')
 
     drawObstacles(edges)  # painting and removing obstacle edges
 
@@ -158,10 +171,22 @@ def bfs():
 
     bfsButton["state"] = "disabled"
 
+def testInputRange(start, target):
+    return start not in grid.keys() or target not in grid.keys()
+
+
 
 def dfs():
-    start = (int(startXcoord.get()), int(startYcoord.get()))
-    target = (int(targetXcoord.get()), int(targetYcoord.get()))
+    try:
+        start = (int(startXcoord.get()), int(startYcoord.get()))  # extracting input from entry boxes
+        target = (int(targetXcoord.get()), int(targetYcoord.get()))
+    except ValueError:
+        print('Input cannot be blank or string')
+        return 0
+
+    if testInputRange(start, target) is True:
+        print('Out of range input coordinates')
+        return 0
 
     explored = []
     queue = [start]

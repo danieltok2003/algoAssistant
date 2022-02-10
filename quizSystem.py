@@ -9,9 +9,6 @@ TODO
 1. get input from user - count questions correct 
 2. count time taken
 3. count questions attempted
-
-
-
 """
 questionFile = 'questions'
 quizQuestions = {}
@@ -29,11 +26,12 @@ class Component:
         with open(questionFile, 'r') as questions:
             for line in questions:
                 question = re.search(r'(.*)\?', line)  # extract all characters before first ? symbol
+
                 options = [item.strip() for item in (re.search(r'\*(.*)\*', line)).group(1).split(',')]
                 # extracts options between the * *, group(1) to remove * * boundary characters,
                 # split options into list separated by ,
                 # item.strip() to trim trailing and ending spaces from options
-                quizQuestions[question.group()] = options  # question.group() as want to include ? at end of string
+                quizQuestions[question.group().replace("\x00", "")] = options  # question.group() as want to include ? at end of string
         return quizQuestions
 
     def clearFrame(self):
@@ -120,11 +118,11 @@ def main():
 
     questions = Component(root).getQuestionData().keys()
 
+    print(questions)
     start_time = time.time()
-
     for key in questions:
-        quizLabel(root).drawQuestion(key)
 
+        quizLabel(root).drawQuestion(key)
         optionA = quizButton(root).drawButton(quizQuestions[key][0], True)
         optionB = quizButton(root).drawButton(quizQuestions[key][1], False)
         optionC = quizButton(root).drawButton(quizQuestions[key][2], False)

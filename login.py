@@ -6,9 +6,8 @@ import teacherLanding
 
 database = 'data.db'  # allow to be set by user
 
-"""
- PASS VARAIBLE TO STUDENT LANDING
-"""
+passingUser = ''
+
 TeacherORStudent = ''
 
 errorTypeToErrorMessage = {
@@ -92,13 +91,6 @@ def errorMessage(errorType):
     print(errorTypeToErrorMessage[errorType])
 
 
-def passUserName(userName):
-    return userName
-
-
-passingUser = ''
-
-
 def login():
     global TeacherORStudent
     userName = ''
@@ -111,7 +103,9 @@ def login():
         STAGE 1 - checking if teacher or student
     
         """
-        TeacherORStudent = input('Are you a teacher (T) or student (S)?: ')  # todo add exception handling + while blocks
+
+        TeacherORStudent = input('Are you a teacher (T) or student (S)?: ')
+
         if checkUserType(TeacherORStudent) is False:  # fail test if input not T or S
             continue  # repeat while loop from top in fail case
         stage1 = True

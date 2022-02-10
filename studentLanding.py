@@ -43,7 +43,6 @@ def updateStats(userName):
         questionsCorrect = int(studentSession.readline())
         questionsAttempted = int(studentSession.readline())
         timeSpent = int(float(studentSession.readline().rstrip()))
-        print(timeSpent)
         f.execute("""
                 UPDATE Students
                 SET 

@@ -3,11 +3,24 @@ import sqlite3
 from generatingSalt import generatePassword
 import os
 import sys
+
 # TODO - report gives time in seconds, not minutes
 file = sqlite3.connect(f'data.db')
 f = file.cursor()
 
 questionFile = 'questions'
+
+minutes = 0
+
+
+def secondsToMinutes(seconds):
+    global minutes
+    if seconds < 60:
+        time = f'{minutes}.{str(round(seconds / 60, 1))[2:]}'   # [2:] to ignore 0
+        minutes = 0  # clear for next session
+        return time
+    minutes += 1
+    return secondsToMinutes(seconds - 60)
 
 
 def relationShips():
@@ -36,9 +49,8 @@ def relationShips():
 
             relation += f' | {", ".join([" ".join(person) for person in f.fetchall()])} |'
             relation += '\n'
-        except TypeError:
+        except TypeError:  # if a class has no students but it has a teacher, ignore adding students to prevent NoneType string concatenation
             continue
-
     return relation
 
 
@@ -63,10 +75,18 @@ def removeRecord(tableType):   # TODO - verify not deleting classrooms with stud
     elif tableType == 'classroom':
         f.execute("SELECT classID, className FROM Classrooms")
     print("|  ID  |  NAME  |")
+    IDrange = []
     for item in f.fetchall():
         print(f'{item[0]} : {item[1]}')
+        IDrange.append(item[0])
 
     ID = input('Enter ID of user/classroom to delete: ')  # TODO - check if ID exists
+    if ID.isalpha() is True:
+        print('Invalid input. Must be integer.')
+        return 0
+    if int(ID) not in IDrange:
+        print('Invalid input. Input must be an existing ID')
+        return 0
     if tableType == 'teacher':
         f.execute("DELETE FROM Teachers WHERE teacherID=?", (ID,))  # todo - unnecessary if repetition
     elif tableType == 'student':
@@ -93,13 +113,24 @@ add button to query student report
 def addData(tableType):
     if tableType == 'classroom':
         className = input('Class name: ')
-
-        f.execute("SELECT teacherID, userName FROM Teachers")
+        if len(className) == 0:
+            print('Class name cannot be blank')
+            return 0
+        f.execute("SELECT teacherID, userName, classID FROM Teachers")
         print("|  ID  |  NAME  |")
+        IDrange = []
         for item in f.fetchall():
             print(f'{item[0]} : {item[1]}')
+            IDrange.append(item[0])
 
         teacherID = input('Choose assigned teacher ID: ')
+        if teacherID.isalpha() is True:
+            print('Invalid input. Must be integer')
+            return 0
+        if int(teacherID) not in IDrange:
+            print('Invalid ID. Try again')
+            return 0
+
         ID = len(classRoomData) + 1
         f.execute("INSERT INTO Classrooms VALUES (?, ?, ?)", (ID, teacherID, className,))
     else:
@@ -108,7 +139,11 @@ def addData(tableType):
         password = input('Assign password: ')
         classID = input('Assign classID: ')  # TODO - VERIFY if classID exists
 
-        userName = firstName[0].lower() + firstName[1:] + lastName[0].upper() + lastName[1:]  # all usernames are camelcase names
+        if len(firstName) == 0 or len(lastName) == 0 or len(password) == 0 or len(classID) == 0:
+            print('One of the entered fields is empty. Try again')
+            return 0
+        else:
+            userName = firstName[0].lower() + firstName[1:].lower() + lastName[0].upper() + lastName[1:].lower()  # all usernames are camelcase names
 
         if tableType == 'teacher':
             ID = len(teacherData) + 1
@@ -126,21 +161,26 @@ def addData(tableType):
 def getReport():
     f.execute("SELECT studentID, userName FROM Students")
     print("|  ID  |  NAME  |")
+    IDrange = []
     for item in f.fetchall():
         print(f'{item[0]} : {item[1]}')
+        IDrange.append(item[0])
 
-    ID = int(input('Give the ID of the desired student report: '))  # TODO - verification
-
+    ID = input('Give the ID of the desired student report: ')  # TODO - verification
+    if ID.isalpha() is True:
+        print('Invalid input. Must be integer.')
+    if int(ID) not in IDrange:
+        print('Invalid ID entered. Try again')
+        return 0
     f.execute("""
             SELECT userName, timeSpent, questionsAttempted, questionsCorrect
             FROM Students S
             WHERE S.studentID=?
               
-              """, (ID,))
+              """, (int(ID),))
     report = list(f.fetchone())
-    print(report)
     print(f'| Student {report[0]} Report |')
-    print(f'{report[1]} minutes spent')
+    print(f'{secondsToMinutes(report[1])} minutes spent')
     print(f'{report[2]} questions attempted')
     print(f'{report[3]} questions answered correctly')
 
@@ -155,7 +195,9 @@ def layoutQuestions():
 
 def addQuestion():
     question = input('Add question: ')
-
+    if len(question) == 0:
+        print('Question cannot be blank. Try again')
+        return 0
     options = input('Add 4 comma separated options, with the first being the correct option: ')
     while options.count(',') != 3:
         print('Need exactly 4 options')
