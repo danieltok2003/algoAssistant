@@ -65,11 +65,17 @@ def paintCoords(x, y, coordType):  # handles painting of start, target, mark, pa
 
 
 def getStartCoords():
-    paintCoords(int(startXcoord.get()), int(startYcoord.get()), 'startCoords')
+    try:
+        paintCoords(int(startXcoord.get()), int(startYcoord.get()), 'startCoords')
+    except ValueError:
+        print('Invalid coordinates entered')
 
 
 def getTargetCoords():
-    paintCoords(int(targetXcoord.get()), int(targetYcoord.get()), 'targetCoords')
+    try:
+        paintCoords(int(targetXcoord.get()), int(targetYcoord.get()), 'targetCoords')
+    except ValueError:
+        print('Invalid coordinates entered')
 
 
 def backTrace(parent, start, end):

@@ -97,7 +97,7 @@ def main(userName):
     """
     exiting
     """
-    exitButton = Button(root, text="Save work", command=root.destroy)
+    exitButton = Button(root, text="Save work", command=quit)
     exitButton.pack()
     """
     main loop

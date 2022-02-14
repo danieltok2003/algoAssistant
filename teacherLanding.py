@@ -169,6 +169,7 @@ def getReport():
     ID = input('Give the ID of the desired student report: ')  # TODO - verification
     if ID.isalpha() is True:
         print('Invalid input. Must be integer.')
+        return 0
     if int(ID) not in IDrange:
         print('Invalid ID entered. Try again')
         return 0
